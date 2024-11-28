@@ -12,5 +12,8 @@
     "Security"
   ],
   "author": "Sahil Ali",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "backend": "file:"
+  }
 }
