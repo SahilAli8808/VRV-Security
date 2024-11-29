@@ -81,11 +81,14 @@ rbac-system/
    BASE_URL=http://localhost:5000
    ```
 
-4. **Run the server:**
+4. **Run the swagger**
    ```bash
-   npm start
+   node swagger.js
    ```
-
+5. **Run the server:**
+   ```bash
+   node index.js
+   ```
 ---
 
 ## API Endpoints
