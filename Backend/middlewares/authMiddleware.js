@@ -1,19 +1,21 @@
 const jwt = require('jsonwebtoken');
-const redis = require('redis');
-const { promisify } = require('util');
-const client = redis.createClient();
 
-const setAsync = promisify(client.set).bind(client);
-const getAsync = promisify(client.get).bind(client);
+// In-memory store for blacklisted tokens
+const blacklistedTokens = new Set();
 
 exports.verifyToken = async (req, res, next) => {
   const token = req.header('Authorization')?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Access denied. No token provided.' });
+  if (!token) {
+    return res.status(401).json({ message: 'Access denied. No token provided.' });
+  }
 
   try {
-    const isBlacklisted = await getAsync(`blacklisted_${token}`);
-    if (isBlacklisted) return res.status(403).json({ message: 'Token is blacklisted.' });
+    // Check if the token is blacklisted
+    if (blacklistedTokens.has(token)) {
+      return res.status(403).json({ message: 'Token is blacklisted.' });
+    }
 
+    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
@@ -27,7 +29,13 @@ exports.blacklistToken = async (token) => {
     const decoded = jwt.decode(token);
     if (decoded) {
       const expiry = decoded.exp * 1000 - Date.now();
-      await setAsync(`blacklisted_${token}`, true, 'PX', expiry);
+      if (expiry > 0) {
+        // Add token to the blacklist
+        blacklistedTokens.add(token);
+
+        // Automatically remove the token from the blacklist when it expires
+        setTimeout(() => blacklistedTokens.delete(token), expiry);
+      }
     }
   } catch (error) {
     console.error('Error blacklisting token:', error);
