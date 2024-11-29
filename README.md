@@ -31,7 +31,7 @@ This project implements a secure and scalable REST API for user authentication a
 ![Swagger Documentation](https://github.com/SahilAli8808/VRV-Security/blob/main/Screenshots/Screenshot%201.png)  
 
 ### 2. Register Endpoint  
-![Role Management](./screenshots/role-management.png)  
+![Role Management](https://github.com/SahilAli8808/VRV-Security/blob/main/Screenshots/Screenshot%201.png)  
 
 ---
 ## Folder Structure
