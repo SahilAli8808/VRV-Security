@@ -1,19 +1,10 @@
 const express = require('express');
-const authMiddleware = require('../middlewares/authMiddleware');
-const roleMiddleware = require('../middlewares/roleMiddleware');
+const { verifyToken } = require('../middlewares/authMiddleware');
+const { requireRole } = require('../middlewares/roleMiddleware');
+const { getUsers } = require('../controllers/userController');
 
 const router = express.Router();
 
-router.get('/admin', authMiddleware, roleMiddleware(['Admin']), (req, res) => {
-  res.send('Welcome, Admin!');
-});
-
-router.get('/moderator', authMiddleware, roleMiddleware(['Moderator']), (req, res) => {
-  res.send('Welcome, Moderator!');
-});
-
-router.get('/user', authMiddleware, roleMiddleware(['User', 'Admin', 'Moderator']), (req, res) => {
-  res.send('Welcome, User!');
-});
+router.get('/', verifyToken, requireRole(['Admin']), getUsers);
 
 module.exports = router;

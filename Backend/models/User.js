@@ -1,17 +1,24 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  name: { type: String, required: true, trim: true },
+  email: { 
+    type: String, 
+    required: true, 
+    unique: true, 
+    lowercase: true, 
+    validate: [validator.isEmail, 'Invalid email address'] 
+  },
+  password: { type: String, required: true, minlength: 6, select: false },
   role: { type: String, enum: ['Admin', 'User', 'Moderator'], default: 'User' },
-  isVerified: { type: Boolean, default: false }
+  emailVerified: { type: Boolean, default: true },
 });
 
 UserSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 12);
   }
   next();
 });
